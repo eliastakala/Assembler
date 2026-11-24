@@ -1,0 +1,10 @@
+# Build outputs
+hello
+*.o
+*.out
+
+# Debug symbols (macOS makes these when compiling with -g)
+*.dSYM/
+
+# macOS junk
+.DS_Store
