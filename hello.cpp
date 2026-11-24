@@ -4,6 +4,8 @@
 #include <bitset>
 #include <typeinfo>
 #include <unordered_map>
+#include <algorithm>
+#include "utils.h"
 
 const std::unordered_map<std::string, std::string> jumpTable = {
     {"JGT", "001"},
@@ -57,9 +59,14 @@ const std::unordered_map<std::string, std::string> compTable = {
 };
 
 std::string translate (std::string row) { //std::string
+    std::string rowToProcess = row;
+    // rowToProcess = row.erase(remove_if(row.begin(), row.end(), isspace), row.end());
+    trim(row);
     char first_char = row.front();
     // if first char is @ then the row is representing A instruction
+    std::cout << row << "currently processing \n";
     if (first_char == '@') {
+        std::cout << "A instruction? \n";
         row.erase(0,1);
         int number = std::stoi(row); 
         std::string binaryString = std::bitset<16>(number).to_string();
@@ -70,24 +77,26 @@ std::string translate (std::string row) { //std::string
     // otherwise it is the C instruction; 111accccccdddjjj, dest=comp;jump
     std::string dest = "000";
     std::string jump = "000";
+    std::cout << "C instruction? \n";
     if (row.find('=') != std::string::npos) {
+        std::cout << "Equal sign? \n";
         std::size_t pos = row.find("=");
         std::string dest_part = row.substr(0, pos);
         dest = destTable.at(dest_part);
-        std::cout << "debug print for dest for " << row << "\n";
         row.erase(0, pos + 1);   
-        std::cout << dest << "\n"; // found dest
     }
     if (row.find(';') != std::string::npos) {
+        std::cout << "half comma? \n";
         std::size_t pos = row.find(";");
         std::string jump_part = row.substr(pos + 1);
-        std::cout << jump_part << "Jump part?\n";
+        std::cout << jump_part << "jump part? \n";
         jump = jumpTable.at(jump_part);
-        std::cout << "debug print for jump for " << row << "\n";
+        std::cout << jump << "from jump tablet? \n";
         row.erase(pos);   
-        std::cout << jump << "\n";
+
         ; // found jump
     }
+    std::cout << "goes to the end? \n";
     std::string binaryStringC = "111";
     binaryStringC = binaryStringC + compTable.at(row) + dest + jump;
     return binaryStringC;
@@ -98,7 +107,7 @@ void read_code() {
     std::ofstream MyFile("Prog.hack");
     std::string myText;
     // Read from the text file
-    std::ifstream MyReadFile("input.txt");
+    std::ifstream MyReadFile("Prog.asm");
     // Use a while loop together with the getline() function to read the file line by line
     std::string output;
     while (getline (MyReadFile, myText)) {
